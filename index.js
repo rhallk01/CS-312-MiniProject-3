@@ -55,10 +55,6 @@ async function blogPosts() {
 }
 let currentUserId;
 let currentUserName; 
-//
-
-
-
 
 //standard home page render, send blog post, tags list, and current page
 app.get("/", async (req, res) => {
@@ -72,12 +68,69 @@ app.get("/login", (req, res) => {
   res.render("login.ejs");
 });
 
-
-
-
 //render registration page
 app.get("/register", (req, res) => {
   res.render("register.ejs");
+});
+
+app.post("/register", async (req, res) => {
+  const userName = req.body.username;
+  const userId = req.body.user_id;
+  const password = req.body.password;
+
+  currentUserId = userId;
+  currentUserName = userName; 
+
+  try {
+    const checkResult = await db.query("SELECT * FROM users WHERE user_id = $1", [
+      userId,
+    ]);
+
+    if (checkResult.rows.length > 0) {
+      res.send("User ID already exists. Try logging in.");
+    } else {
+      const result = await db.query(
+        "INSERT INTO users (user_id, password, name) VALUES ($1, $2, $3)",
+        [userId, password, userName]
+      );
+
+      res.render("/");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const userName = req.body.username;
+  const userId = req.body.user_id;
+  const password = req.body.password;
+
+  currentUserId = userId;
+  currentUserName = userName; 
+
+  try {
+    const result = await db.query("SELECT * FROM users WHERE user_id = $1", [
+      userId,
+    ]);
+    if (result.rows.length > 0) {
+      const storedPassword = user.password;
+
+      if (password === storedPassword) {
+        res.render("/");
+      } else {
+        res.send("Incorrect Password");
+      }
+    } else {
+      res.send("User not found");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 //render make blog post page
