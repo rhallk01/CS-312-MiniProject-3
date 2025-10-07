@@ -150,6 +150,10 @@ app.post("/login", async (req, res) => {
 
 //render make blog post page
 app.get("/form", (req, res) => {
+  //make sure they are a user! [NEW]
+  if (!currentUserId){
+    return res.redirect('/');
+  }
   res.render("form.ejs", {tags:tags});
 });
 
@@ -160,6 +164,11 @@ app.get("/clickHome", (req, res) => {
 
 //submit a blog post, then go back to home page
 app.post('/submitPost', async (req, res) => {
+    //make sure they are a user! [NEW]
+    if (!currentUserId){
+      return res.redirect('/');
+    }
+  
     //retrieve name, title, content, and tag from form
     const creatorName = currentUserName;//GET FROM DB HELP
     const creatorID = currentUserId;//GET FROM DB HELP
