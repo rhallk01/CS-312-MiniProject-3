@@ -89,12 +89,12 @@ app.post("/register", async (req, res) => {
     if (checkResult.rows.length > 0) {
       res.send("User ID already exists. Try logging in.");
     } else {
-      const result = await db.query(
+      await db.query(
         "INSERT INTO users (user_id, password, name) VALUES ($1, $2, $3)",
         [userId, password, userName]
       );
 
-      res.render("/");
+      res.redirect("/");
     }
   } catch (err) {
     console.log(err);
@@ -102,7 +102,6 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const userName = req.body.username;
   const userId = req.body.user_id;
   const password = req.body.password;
 
@@ -114,9 +113,12 @@ app.post("/login", async (req, res) => {
       userId,
     ]);
     if (result.rows.length > 0) {
+      const user = result.rows[0];
       const storedPassword = user.password;
 
       if (password === storedPassword) {
+        currentUserId = user.user_id;
+        currentUserName = user.name;
         res.render("/");
       } else {
         res.send("Incorrect Password");
