@@ -55,7 +55,7 @@ label{
   font-size: 1rem; 
 }
 
-.makeAPost{
+.makeAPost, .login{
   margin-top: 15rem;
   margin-bottom: 0.2rem;
 }

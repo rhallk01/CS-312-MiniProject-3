@@ -53,6 +53,9 @@ async function blogPosts() {
   }));
   return posts;
 }
+let currentUserId;
+let currentUserName; 
+//
 
 //standard home page render, send blog post, tags list, and current page
 app.get("/", async (req, res) => {
@@ -74,8 +77,8 @@ app.get("/clickHome", (req, res) => {
 //submit a blog post, then go back to home page
 app.post('/submitPost', async (req, res) => {
     //retrieve name, title, content, and tag from form
-    const creatorName = ;//GET FROM DB HELP
-    const creatorID = ;//GET FROM DB HELP
+    const creatorName = currentUserName;//GET FROM DB HELP
+    const creatorID = currentUserId;//GET FROM DB HELP
     const blogTitle = req.body.blogTitle;
     const content = req.body.content;
     const tagName = req.body.tagName.toLowerCase();
