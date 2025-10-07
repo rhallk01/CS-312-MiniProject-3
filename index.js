@@ -3,10 +3,12 @@ import express from "express";
 import bodyParser from "body-parser";
 import methodOverride from 'method-override';
 import pg from "pg";
+import ejs from "ejs";
 
 //set up express and the port
 const app = express();
 const port = 3000;
+app.engine("ejs", ejs.__express);
 
 //connect to database
 const db = new pg.Client({
@@ -39,7 +41,7 @@ app.use(methodOverride(function (req, res) {
 var tags = ["all" ,"tech", "lifestyle", "local", "diy", "art", "gardening", "sports"];
 
 //function to get posts 
-async function blogPosts() {
+async function getPosts() {
   const result = await db.query("SELECT * FROM blogs");
   const posts = result.rows.map((post) => ({
     name: post.creator_name,
@@ -65,12 +67,12 @@ app.get("/", async (req, res) => {
 
 //render login page
 app.get("/login", (req, res) => {
-  res.render("login.ejs");
+  res.render("login.ejs", { error: '' });
 });
 
 //render registration page
 app.get("/register", (req, res) => {
-  res.render("register.ejs");
+  res.render("register.ejs", { error: '' });
 });
 
 app.post("/register", async (req, res) => {
@@ -78,23 +80,21 @@ app.post("/register", async (req, res) => {
   const userId = req.body.user_id;
   const password = req.body.password;
 
-  currentUserId = userId;
-  currentUserName = userName; 
-
   try {
     const checkResult = await db.query("SELECT * FROM users WHERE user_id = $1", [
       userId,
     ]);
 
     if (checkResult.rows.length > 0) {
-      res.send("User ID already exists. Try logging in.");
+      res.render("register.ejs", { error: "User ID already exists. Try logging in" });
     } else {
       await db.query(
         "INSERT INTO users (user_id, password, name) VALUES ($1, $2, $3)",
         [userId, password, userName]
       );
-
-      res.redirect("/");
+      currentUserId = userId;
+      currentUserName = userName; 
+      return res.redirect("/");
     }
   } catch (err) {
     console.log(err);
@@ -104,9 +104,6 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   const userId = req.body.user_id;
   const password = req.body.password;
-
-  currentUserId = userId;
-  currentUserName = userName; 
 
   try {
     const result = await db.query("SELECT * FROM users WHERE user_id = $1", [
@@ -119,20 +116,16 @@ app.post("/login", async (req, res) => {
       if (password === storedPassword) {
         currentUserId = user.user_id;
         currentUserName = user.name;
-        res.render("/");
+        res.redirect("/");
       } else {
-        res.send("Incorrect Password");
+        res.render("login.ejs", { error: "Incorrect password" });
       }
     } else {
-      res.send("User not found");
+      res.render("login.ejs", { error: "User not found" });
     }
   } catch (err) {
     console.log(err);
   }
-});
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
 });
 
 //render make blog post page
@@ -165,18 +158,35 @@ app.post('/submitPost', async (req, res) => {
 });
 
 //go to the edit page with a particular post
-app.get("/edit/:id", (req, res) => {
-  //use the id to find the original post
-  const post = blogPosts.find(p => p.id == req.params.id);
+app.get("/edit/:id", async (req, res) => {
+    var post = {};
+    //find the original post by id
+    const result = await db.query("SELECT * FROM blogs WHERE blog_id = $1", [
+      req.params.id,
+    ]);
+    if (result.rows.length > 0) {
+      const gotPost = result.rows[0];
+      if (gotPost.creator_user_id !== currentUserId){
+        return res.redirect('/');
+      }
+      post = {name: gotPost.creator_name, title: gotPost.title, content: gotPost.body, time: gotPost.time_updated, initTime: gotPost.date_created, id: gotPost.blog_id, tag: gotPost.tag};
+    } else{
+      return res.redirect('/');
+    }
   //remder the edits page using the post found to pre-fill in the inputs
-  res.render("edit.ejs", { blogPost: post, tags:tags });
+  return res.render("edit.ejs", { blogPost: post, tags:tags });
 });
 
 //submit edits to a post, then go redirect to home
 app.post('/edit-form/:id', async (req, res) => {
+    var post;
     //find the original post by id
-    const post = blogPosts.find(p => p.id == req.params.id);
-
+    const result = await db.query("SELECT * FROM blogs WHERE blog_id = $1", [
+      req.params.id,
+    ]);
+    if (result.rows.length > 0) {
+      post = result.rows[0];
+    }
     //if the post is found, update it
     if(post)
     {
@@ -214,7 +224,7 @@ app.post("/tagSort", (req, res) => {
   }
   
   //render home page with filtered posts 'taggedPosts' as tags
-  res.redirect("/");
+  return res.redirect("/");
 });
 
 //if the delete button on a post is clicked, delete it and redirect home
