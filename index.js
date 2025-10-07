@@ -57,11 +57,27 @@ let currentUserId;
 let currentUserName; 
 //
 
+
+
+
 //standard home page render, send blog post, tags list, and current page
 app.get("/", async (req, res) => {
   var blogPosts = await getPosts();
   //const currentUser = await getCurrentUser();
   res.render("index.ejs", {blogPosts: blogPosts, tags:tags, currentPage: 'index'});
+});
+
+//render login page
+app.get("/login", (req, res) => {
+  res.render("login.ejs");
+});
+
+
+
+
+//render registration page
+app.get("/register", (req, res) => {
+  res.render("register.ejs");
 });
 
 //render make blog post page
