@@ -1,16 +1,30 @@
 //Add import statements
 import express from "express";
 import bodyParser from "body-parser";
-import methodOverride from 'method-override'
+import methodOverride from 'method-override';
+import pg from "pg";
 
 //set up express and the port
 const app = express();
 const port = 3000;
 
+//connect to database
+const db = new pg.Client({
+  user: "postgres",
+  host: "localhost",
+  database: "BlogDB",
+  password: "darkgreyseaslug1234",
+  port: 5432,
+});
+db.connect();
+
+
 //tell express what folder the static files are, make them accessible with relative urls
 app.use(express.static("public"));
 //parse data that is recieved
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
 app.use(methodOverride(function (req, res) {
     if (req.body && typeof req.body === 'object' && '_method' in req.body) {
       // look in urlencoded POST bodies and delete it
@@ -21,14 +35,29 @@ app.use(methodOverride(function (req, res) {
     }
   }))
 
-//set up variables to be used later
-//like a list for the blog posts, a list of tags, and the initial id number to iterate
-var blogPosts = [];
+//set up tags variables to be used later
 var tags = ["all" ,"tech", "lifestyle", "local", "diy", "art", "gardening", "sports"];
-var idNum = 0;
+
+//function to get posts 
+async function getPosts() {
+  const result = await db.query(
+    "SELECT * FROM blogs",
+  );
+  let posts = [];
+  var newPost = {};
+  result.rows.forEach((post) => {
+    newPost = {name: post.creator_name, title: post.title, content: post.body, time: post.time_updated, initTime: post.date_created, id: post.blog_id, tag: post.tag, creator_id: post.creator_user_id};
+    posts.push(newPost);
+  });
+  return posts;
+}
+
+
 
 //standard home page render, send blog post, tags list, and current page
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  var blogPosts = await getPosts();
+  //const currentUser = await getCurrentUser();
   res.render("index.ejs", {blogPosts: blogPosts, tags:tags, currentPage: 'index'});
 });
 
