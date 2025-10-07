@@ -99,29 +99,26 @@ app.get("/edit/:id", (req, res) => {
 });
 
 //submit edits to a post, then go redirect to home
-app.post('/edit-form/:id', (req, res) => {
+app.post('/edit-form/:id', async (req, res) => {
     //find the original post by id
     const post = blogPosts.find(p => p.id == req.params.id);
 
     //if the post is found, update it
     if(post)
     {
-        //update name, title, content
-        post.name= req.body.creatorName;
-        post.title = req.body.blogTitle;
-        post.content = req.body.content;
+        //get updated title content and tag
+        var id = req.params.id;
+        var title = req.body.blogTitle;
+        var content = req.body.content;
+        const tagName = req.body.tagName?.toLowerCase() || 'all';
 
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        post.tag = req.body.tagName.toLowerCase();
-
-        //add an updated time so the post shows when it was made and when it was edited
-        const time = `${month}-${day}-${year}`;
-        post.time = post.initTime + ", Date: " + time;
+        //add post to DB
+        await db.query(
+          "UPDATE blogs \
+          SET title = $1, body = $2, time_updated = NOW(), tag = $3 \
+          WHERE blog_id = $4;",
+          [title, content, tagName, id]
+        );
     }
 
     //redirect home
@@ -147,11 +144,16 @@ app.post("/tagSort", (req, res) => {
 });
 
 //if the delete button on a post is clicked, delete it and redirect home
-app.delete('/delete', (req, res) => {
+app.delete('/delete', async (req, res) => {
     //get id number of post to delete from param
     //and remove it from blogPosts with filter
     const idNum = parseInt(req.body.id);
-    blogPosts = blogPosts.filter(item => item.id !== idNum);
+    //delete post from DB
+    await db.query(
+      "DELETE FROM blogs \
+      WHERE blog_id = $1;",
+      [idNum]
+   );
     return res.redirect('/');
 });
 
