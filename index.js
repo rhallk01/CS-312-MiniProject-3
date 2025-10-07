@@ -45,7 +45,7 @@ async function blogPosts() {
     name: post.creator_name,
     title: post.title,
     content: post.body,
-    time: post.date_updated,
+    time: post.time_updated,
     initTime: post.date_created,
     id: post.blog_id,
     tag: post.tag,
@@ -53,7 +53,6 @@ async function blogPosts() {
   }));
   return posts;
 }
-
 
 //standard home page render, send blog post, tags list, and current page
 app.get("/", async (req, res) => {
@@ -73,29 +72,20 @@ app.get("/clickHome", (req, res) => {
 });
 
 //submit a blog post, then go back to home page
-app.post('/submitPost', (req, res) => {
+app.post('/submitPost', async (req, res) => {
     //retrieve name, title, content, and tag from form
-    const creatorName = req.body.creatorName;
+    const creatorName = ;//GET FROM DB HELP
+    const creatorID = ;//GET FROM DB HELP
     const blogTitle = req.body.blogTitle;
     const content = req.body.content;
     const tagName = req.body.tagName.toLowerCase();
 
-    //get the current date and time as MM-DD-YYYY HH:MM
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const time = `${month}-${day}-${year} ${hours}:${minutes}`;
-
-    //get new id by iterating the idNum variable
-    idNum += 1;
-
-    //create post, add it to blogPosts
-    const newPost = {name: creatorName, title: blogTitle, content: content, time: time, initTime: time, id: idNum, tag: tagName};
-    blogPosts.push(newPost);
-
+    //add post to DB
+    const result = await db.query(
+      "INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created, time_updated, tag ) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5);",
+      [creatorName, creatorID, blogTitle, content, tagName]
+    );
+    
     //redirect to home page
     return res.redirect('/');
 });
@@ -153,7 +143,7 @@ app.post("/tagSort", (req, res) => {
   }
   
   //render home page with filtered posts 'taggedPosts' as tags
-  res.render("index.ejs", {blogPosts:taggedPosts, tags:tags, currentPage: 'index'});
+  res.redirect("/");
 });
 
 //if the delete button on a post is clicked, delete it and redirect home
