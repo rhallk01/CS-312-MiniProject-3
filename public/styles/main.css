@@ -1,0 +1,207 @@
+body {
+  background: #A8BBA3;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  color: #715A5A;
+}
+
+main {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+h1 {
+  font-size: 3rem;
+}
+
+input, textarea {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  font-size: 0.9rem;
+  background: #715A5A;
+  padding: .5rem;
+  color: white;
+  cursor: pointer;
+  box-shadow: 
+  inset 2px 2px 5px #5c2d0c, 
+  inset -2px -2px 5px #9b6c40;
+  max-width: 22rem;
+}
+
+input[type="submit"].formSubmit {
+  margin-left: 80%; 
+    box-shadow: 
+    -2px -2px 5px rgba(255, 255, 255, 0.2),
+    2px 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 0 5px rgba(0, 0, 0, 0.2); 
+}
+
+.selectorSubmit{
+  font-size: .7em;
+  padding: .3em;
+  background-color: #A8BBA3;
+  box-shadow: none;
+}
+
+label{
+  font-size: 1rem; 
+}
+
+.makeAPost{
+  margin-top: 15rem;
+  margin-bottom: 0.2rem;
+}
+
+.formsDiv {
+  margin-bottom: .6rem;
+  margin-left: 20%;
+  margin-right: 20%;
+  border: #715A5A;
+  border-style: solid;
+  border-radius: 10%;
+  padding: 3%;
+  background-color: #e4dcc1;
+  box-shadow: 
+  inset 2px 2px 5px rgba(0, 0, 0, 0.3),
+  inset -2px -2px 5px rgba(255, 255, 255, 0.7);  
+}
+
+.postBox{
+  position: relative;
+  margin: 2rem 10% 2rem 10%;
+  padding: 2rem;
+  padding-bottom: 1rem;
+  border: 2px solid #715A5A;
+  background-color: #e4dcc1;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+}
+
+.postBox p {
+  margin: 0; 
+  line-height: .8rem; 
+  color: #715A5A; 
+  font-size: 1rem;   
+}
+
+#titleBanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #715A5A;
+  color: #e4dcc1;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-height: 12rem;
+}
+
+a:link, a:visited {
+  background-color: #A8BBA3;;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+a:hover, a:active {
+  background-color: #A8BBA3;;
+}
+
+.blogPostDiv{
+  width: 100%;
+}
+
+.blogPostDiv a{
+  margin-top: .5rem;
+  font-size: .8rem;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editBtn {
+  border-radius: 5px;
+  box-shadow:
+    -2px -2px 5px rgba(255, 255, 255, 0.2),
+    2px 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.name {
+  text-align: left;
+  margin-top: 0rem;
+}
+
+.title {
+  text-align: left;
+  margin: .1rem 0 0.5rem;
+  font-size: 1.5rem;
+  color: #4a4a4a;
+}
+
+.content {
+  text-align: left;
+}
+
+.tag {
+  align-self: flex-start;
+  display: inline-block;
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #715A5A;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  box-shadow:
+    -2px -2px 5px rgba(255, 255, 255, 0.2),
+    2px 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+hr {
+  border-style: solid;
+  border-color: #715A5A;
+  background-color: #715A5A;
+  border-width: .2rem;
+  width: 70%;
+}
+
+#deletebtn{
+  margin-top: .5rem;
+  background-color: #A8BBA3;;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.8rem;
+  line-height: 1.05rem;
+  padding: 10px 18px;
+  border-radius: 5px;
+  border: none;
+  box-shadow:
+    -2px -2px 5px rgba(255, 255, 255, 0.2),
+    2px 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 0 5px rgba(0, 0, 0, 0.2);
+}

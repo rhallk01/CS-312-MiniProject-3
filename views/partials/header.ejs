@@ -1,0 +1,42 @@
+<!-- add all the stuff that should be on every page (banner, beginning html stuff) -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- connect to the css -->
+  <link rel="stylesheet" href="/styles/main.css">
+  <title>Blog Buddies!</title>
+</head>
+
+<!-- banner at the top of all of the pages -->
+<div id="titleBanner">
+<h1>Blog Buddies!</h1>
+<nav>
+    <!-- home and new post buttons -->
+    <a href="/">Home</a>
+    <a href="/form">New Post</a>
+    <!-- if on the home page, put the tags dropdown in the banner -->
+    <!-- the if statement checks whether a variable called currentPage was passed-->
+    <% if (locals.currentPage) { %>
+        <form action="/tagSort" method="POST">
+            <div class="dropdown">
+            <!-- dropdown label -->
+            <label for="tag">Sort by Tag:</label>
+            <!-- dropdown -->
+            <select name="tag" id="tag">
+                <% tags.forEach(function(tag) { %>
+                <option value="<%= tag %>"><%= tag %></option>
+                <% }) %>
+            </select>
+            <!-- submit the dropdown to make it so that only the posts w those tags show -->
+            <input class="selectorSubmit" type="submit" value="Go!">
+            </div>
+        </form>
+    <% } %>
+
+</nav>
+</div>
+
+<main>

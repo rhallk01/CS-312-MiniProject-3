@@ -1,0 +1,72 @@
+<!-- include the code from partials (banner with nav) -->
+<%- include("partials/header.ejs") %>
+
+<body>   
+<!-- Blog Posts -->
+<h1 class="makeAPost">Blog Posts</h1>
+<div class="blogPostDiv">
+    <%if (locals.blogPosts.length == 0 ){%>
+        <h2>Be the first to post!</h2>
+    <%}%>
+    <!-- loop through the array of blogPosts -->
+    <%if (locals.blogPosts) { for (let i = 0; i < blogPosts.length; i++) {%>
+        <!-- postbox is the cute container for the post data -->
+        <div class="postBox">
+            <div class="topRow">
+                <!-- put date at the top left -->
+                <span class="time">Date: <%= blogPosts[i].time %></span>
+                <!-- put the edit and delete buttons at the top right -->
+                <div class="buttonGroup">
+                    <a href="/edit/<%= blogPosts[i].id %>" class="editBtn">Edit</a>
+                    <form action="/delete" method="POST">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="id" value="<%= blogPosts[i].id  %>">
+                        <button type="submit" id= "deletebtn" >Delete</button>
+                    </form>
+                </div>
+            </div>
+            <!-- put the creator name, post title, content, and tag in the post -->
+            <p class="name">Creator: <strong><%= blogPosts[i].name %></strong></p>
+            <h3 class="title"><%= blogPosts[i].title %></h3>
+            <p class="content"><%= blogPosts[i].content %></p>
+            <h5 class="tag"><%= blogPosts[i].tag%></h5>
+        </div>
+    <%}}%>
+</div>
+<hr>
+<!-- Blog post form -->
+<h1>Build-a-Blog</h1>
+<div class="formsDiv">
+    <form action="/submitPost" method="POST">
+        <!-- get name -->
+        <label for="creatorName">Name:</label><br>
+        <input type="text" id="creatorName" name="creatorName" required><br><br>
+
+        <!-- get title -->
+        <label for="blogTitle">Blog Title:</label><br>
+        <input type="text" id="blogTitle" name="blogTitle" required><br><br>
+
+        <!-- get tag w dropdown -->
+        <label for="tagName">Tag (optional):</label><br>
+        <select name="tagName" id="tagName">
+            <% tags.forEach(function(tag) { %>
+                <option value="<%= tag %>"><%= tag %></option>
+            <% }) %>
+        </select>
+        <br><br>
+
+        <!-- get content -->
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content" rows="5" cols="50"></textarea>
+        <br><br>
+
+        <!-- submit -->
+        <input class="formSubmit" type="submit" value="Submit">
+
+    </form>
+</div>
+
+
+</body>
+</main>
+</html>

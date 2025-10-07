@@ -1,0 +1,141 @@
+//Add import statements
+import express from "express";
+import bodyParser from "body-parser";
+import methodOverride from 'method-override'
+
+//set up express and the port
+const app = express();
+const port = 3000;
+
+//tell express what folder the static files are, make them accessible with relative urls
+app.use(express.static("public"));
+//parse data that is recieved
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverride(function (req, res) {
+    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+      // look in urlencoded POST bodies and delete it
+      var method = req.body._method
+      console.log(method,req.body._method)
+      delete req.body._method
+      return method
+    }
+  }))
+
+//set up variables to be used later
+//like a list for the blog posts, a list of tags, and the initial id number to iterate
+var blogPosts = [];
+var tags = ["all" ,"tech", "lifestyle", "local", "diy", "art", "gardening", "sports"];
+var idNum = 0;
+
+//standard home page render, send blog post, tags list, and current page
+app.get("/", (req, res) => {
+  res.render("index.ejs", {blogPosts: blogPosts, tags:tags, currentPage: 'index'});
+});
+
+//render make blog post page
+app.get("/form", (req, res) => {
+  res.render("form.ejs", {tags:tags});
+});
+
+//if the home button is clicked, redirect to home page render
+app.get("/clickHome", (req, res) => {
+  return res.redirect('/');
+});
+
+//submit a blog post, then go back to home page
+app.post('/submitPost', (req, res) => {
+    //retrieve name, title, content, and tag from form
+    const creatorName = req.body.creatorName;
+    const blogTitle = req.body.blogTitle;
+    const content = req.body.content;
+    const tagName = req.body.tagName.toLowerCase();
+
+    //get the current date and time as MM-DD-YYYY HH:MM
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const time = `${month}-${day}-${year} ${hours}:${minutes}`;
+
+    //get new id by iterating the idNum variable
+    idNum += 1;
+
+    //create post, add it to blogPosts
+    const newPost = {name: creatorName, title: blogTitle, content: content, time: time, initTime: time, id: idNum, tag: tagName};
+    blogPosts.push(newPost);
+
+    //redirect to home page
+    return res.redirect('/');
+});
+
+//go to the edit page with a particular post
+app.get("/edit/:id", (req, res) => {
+  //use the id to find the original post
+  const post = blogPosts.find(p => p.id == req.params.id);
+  //remder the edits page using the post found to pre-fill in the inputs
+  res.render("edit.ejs", { blogPost: post, tags:tags });
+});
+
+//submit edits to a post, then go redirect to home
+app.post('/edit-form/:id', (req, res) => {
+    //find the original post by id
+    const post = blogPosts.find(p => p.id == req.params.id);
+
+    //if the post is found, update it
+    if(post)
+    {
+        //update name, title, content
+        post.name= req.body.creatorName;
+        post.title = req.body.blogTitle;
+        post.content = req.body.content;
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        post.tag = req.body.tagName.toLowerCase();
+
+        //add an updated time so the post shows when it was made and when it was edited
+        const time = `${month}-${day}-${year}`;
+        post.time = post.initTime + ", Date: " + time;
+    }
+
+    //redirect home
+    return res.redirect('/');
+});
+
+//if the user chooses a tag from the dropdown to sort by and clicks the
+//go! submit button, show only correctly tagged posts on home page
+app.post("/tagSort", (req, res) => {
+  //get tag from request, if all show all blog posts
+  
+  const pickedTag = req.body.tag.toLowerCase();
+  var taggedPosts = [];
+  if (pickedTag == "all"){
+      taggedPosts = blogPosts;
+  //else, show only those with the tag using filter
+  }else{
+      taggedPosts = blogPosts.filter(p => p.tag == pickedTag);
+  }
+  
+  //render home page with filtered posts 'taggedPosts' as tags
+  res.render("index.ejs", {blogPosts:taggedPosts, tags:tags, currentPage: 'index'});
+});
+
+//if the delete button on a post is clicked, delete it and redirect home
+app.delete('/delete', (req, res) => {
+    //get id number of post to delete from param
+    //and remove it from blogPosts with filter
+    const idNum = parseInt(req.body.id);
+    blogPosts = blogPosts.filter(item => item.id !== idNum);
+    return res.redirect('/');
+});
+
+//start the Express server
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+});
