@@ -39,19 +39,20 @@ app.use(methodOverride(function (req, res) {
 var tags = ["all" ,"tech", "lifestyle", "local", "diy", "art", "gardening", "sports"];
 
 //function to get posts 
-async function getPosts() {
-  const result = await db.query(
-    "SELECT * FROM blogs",
-  );
-  let posts = [];
-  var newPost = {};
-  result.rows.forEach((post) => {
-    newPost = {name: post.creator_name, title: post.title, content: post.body, time: post.time_updated, initTime: post.date_created, id: post.blog_id, tag: post.tag, creator_id: post.creator_user_id};
-    posts.push(newPost);
-  });
+async function blogPosts() {
+  const result = await db.query("SELECT * FROM blogs");
+  const posts = result.rows.map((post) => ({
+    name: post.creator_name,
+    title: post.title,
+    content: post.body,
+    time: post.date_updated,
+    initTime: post.date_created,
+    id: post.blog_id,
+    tag: post.tag,
+    creator_id: post.creator_user_id,
+  }));
   return posts;
 }
-
 
 
 //standard home page render, send blog post, tags list, and current page
